@@ -36,3 +36,7 @@ This action abstracts the following steps:
 1. Creating the Octopus Deploy release
 
 Because release workflows cannot be easily tested in each repo, combining these tasks into a single action allows running through CI using a fake "release" so that PRs can be merged with confidence.
+
+## License
+
+The scripts and documentation in this project are released under the [MIT License](LICENSE.md).
