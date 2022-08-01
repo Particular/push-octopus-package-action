@@ -1,0 +1,53 @@
+name: CI
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+jobs:
+  ci:
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-2019, ubuntu-20.04 ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.0.2
+      - name: Create artifacts to test release
+        shell: pwsh
+        run: |
+          # Fake MinVer environment variables
+          $major = Get-Date -Format "yyyy"
+          $minor = Get-Date -Format "Mdd"
+          $patch = Get-Random
+          echo "MinVerVersion=$major.$minor.$patch" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "MinVerMajor=$major" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "MinVerMinor=$minor" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+          # Create NuGet packages and assets
+          mkdir nugets
+          mkdir assets
+          echo "This is asset 1" > assets/asset-1.txt
+          echo "This is asset 2" > assets/asset-2.txt
+          echo "This is not really a NuGet package" > nugets/Fake.Package1.nupkg
+          echo "This is not really a NuGet package" > nugets/Fake.Package2.nupkg
+
+      - name: Run
+        uses: ./
+        with:
+          connection-string-name: octopus-deploy-api-key
+          tag: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
+      - name: Validate
+        shell: pwsh
+        run: |
+          echo "Outputting contents of Metadata.ps1:"
+          echo packaging/Metadata.ps1
+
+          echo "Validation of constructed Octopus Deploy package must be done by manually inspecting the asset in GitHub Actions."
