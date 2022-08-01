@@ -38,7 +38,7 @@ runs:
         }
 
         # Include executables in the `assets` folder - used for ServiceControl, ServicePulse, ServiceInsight, etc.
-        cp assets\* .\packaging\content
+        cp assets/* ./packaging/content
         
         # Octopus Deploy scripts need an executable file to recreate this metadata
         # $Branch is not really the branch name, when built from a tag it will be the tagged version string
