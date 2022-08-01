@@ -42,8 +42,7 @@ jobs:
       - name: Run
         uses: ./
         with:
-          connection-string-name: octopus-deploy-api-key
-          tag: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
+          octopus-deploy-api-key: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
       - name: Validate
         shell: pwsh
         run: |

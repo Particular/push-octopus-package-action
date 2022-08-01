@@ -14,7 +14,7 @@ runs:
     - name: Create Octopus Package
       run: |
         # Check for required environment variables
-        Write-Output "Looking in env vars for version info, found Version $($env.MinVerVersion), Major $($env.MinVerMajor), Minor $($env.MinVerMinor)"
+        Write-Output "Looking in env vars for version info, found Version ${{env.MinVerVersion}}, Major ${{env.MinVerMajor}}, Minor ${{env.MinVerMinor}}"
         if ($env.MinVerVersion && $env.MinVerMajor && $env.MinVerMinor) {
           Write-Output "Version info OK"
         } else {
