@@ -17,7 +17,7 @@ Before this action runs:
 
 ```yaml
     steps:
-      - name: Run tests
+      - name: Deploy
         uses: Particular/push-octopus-package-action@v1.0.0
         with:
           octopus-deploy-api-key: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
