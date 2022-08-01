@@ -47,6 +47,6 @@ jobs:
         shell: pwsh
         run: |
           echo "Outputting contents of Metadata.ps1:"
-          echo packaging/Metadata.ps1
+          cat packaging/Metadata.ps1
 
           echo "Validation of constructed Octopus Deploy package must be done by manually inspecting the asset in GitHub Actions."
