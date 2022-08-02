@@ -32,13 +32,23 @@ runs:
         
         # Include NuGet packages in the `nugets` folder
         # Octopus expects NuGet packages to have an extra .nzip extension for NuGet, .czip for Chocolatey
-        $nugets = Get-ChildItem -Path "./nugets/*.nupkg"
-        foreach ($file in $nugets) {
-          cp $file "./packaging/content/$($file.Name).nzip"
+        if (Test-Path -Path nugets) {
+          $nugets = Get-ChildItem -Path "./nugets/*.nupkg"
+          foreach ($file in $nugets) {
+            cp $file "./packaging/content/$($file.Name).nzip"
+          }
         }
 
         # Include executables in the `assets` folder - used for ServiceControl, ServicePulse, ServiceInsight, etc.
-        cp assets/* ./packaging/content
+        if (Test-Path -Path assets) {
+          cp assets/* ./packaging/content
+        }
+
+        # Make sure we aren't creating a package with zero contents
+        $assetCount = (Get-ChildItem -Path ./packaging/content | Measure-Object).Count
+        if ($assetCount -eq 0) {
+          throw "No assets were found for the deployment package"
+        }
         
         # Octopus Deploy scripts need an executable file to recreate this metadata
         # $Branch is not really the branch name, when built from a tag it will be the tagged version string
