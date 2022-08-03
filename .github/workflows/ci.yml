@@ -50,12 +50,13 @@ jobs:
           cat packaging/Metadata.ps1
 
           echo "Outputting all files in the packaging directory"
-          $contents = Get-ChildItem -Recurse -Path packaging
+          $contents = Get-ChildItem -Recurse -Path packaging | Select-Object -Property FullName
           echo $contents
           if (($contents | Measure-Object).Count -ne 6) {
             throw "Unexpected number of files in packaging directory"
           }
 
+          echo ""
           echo "Validation of constructed Octopus Deploy package must be done by manually inspecting the asset in GitHub Actions."
 
       - name: Prepare for second test with metadata
@@ -92,10 +93,11 @@ jobs:
           cat packaging/Metadata.ps1
 
           echo "Outputting all files in the packaging directory"
-          $contents = Get-ChildItem -Recurse -Path packaging
+          $contents = Get-ChildItem -Recurse -Path packaging | Select-Object -Property FullName
           echo $contents
           if (($contents | Measure-Object).Count -ne 9) {
             throw "Unexpected number of files in packaging directory"
           }
 
+          echo ""
           echo "Validation of constructed Octopus Deploy package must be done by manually inspecting the asset in GitHub Actions."
