@@ -15,12 +15,39 @@ Before this action runs:
 
 ## Usage
 
+### Basic usage
+
 ```yaml
     steps:
       - name: Deploy
         uses: Particular/push-octopus-package-action@v1.0.0
         with:
           octopus-deploy-api-key: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
+```
+
+### Additional metadata
+
+This is used primarily for [ServiceControl](https://github.com/Particular/ServiceControl/blob/master/.github/workflows/release.yml). One or more additional file patterns can be specified, one per line, that will be included in the root of the deployment package. Encoding this data as JSON files with `ConvertTo-Json` in the workflow and `ConvertFrom-Json` on the deployment server is recommended.
+
+```yaml
+    steps:
+      - name: Deploy
+        uses: Particular/push-octopus-package-action@v1.0.0
+        with:
+          octopus-deploy-api-key: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
+          additional-metadata-paths: metadata/*.json
+
+```
+
+```yaml
+    steps:
+      - name: Deploy
+        uses: Particular/push-octopus-package-action@v1.0.0
+        with:
+          octopus-deploy-api-key: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
+          additional-metadata-paths: |
+            metadata/*.json
+            other-directory/*.txt
 ```
 
 ## How it works

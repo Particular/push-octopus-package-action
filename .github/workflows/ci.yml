@@ -57,6 +57,9 @@ jobs:
       - name: Prepare for second test with metadata
         shell: pwsh
         run: |
+          # Remove packaging directory from first Run
+          rm -R packaging
+
           # Create extra metadata files for use in 2nd Run
           mkdir metadata
           echo "This is metadata" > metadata/CustomMetadata1.json
