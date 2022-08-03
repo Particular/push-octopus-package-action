@@ -50,7 +50,7 @@ jobs:
           cat packaging/Metadata.ps1
 
           echo ""
-          echo "Outputting all files in the packaging directory"
+          echo "Outputting all files in the packaging directory:"
           $contents = Get-ChildItem -Recurse -Path packaging | Select-Object -Property FullName
           echo $contents | Out-String -Width 1000
           if (($contents | Measure-Object).Count -ne 6) {
@@ -94,7 +94,7 @@ jobs:
           cat packaging/Metadata.ps1
 
           echo ""
-          echo "Outputting all files in the packaging directory"
+          echo "Outputting all files in the packaging directory:"
           $contents = Get-ChildItem -Recurse -Path packaging | Select-Object -Property FullName
           echo $contents | Out-String -Width 1000
           if (($contents | Measure-Object).Count -ne 9) {
