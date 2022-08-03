@@ -4,6 +4,10 @@ inputs:
   octopus-deploy-api-key:
     description: 'API key for Octopus Deploy, which should already be masked as a secret'
     required: true
+  additional-metadata-paths:
+    description: 'Additional metadata files that should be copied to the root of the deployment package. File patterns are supported, one pattern per line.'
+    required: false
+    default: ''
 runs:
   using: "composite"
   steps:
@@ -12,6 +16,8 @@ runs:
       with:
         version: latest
     - name: Create Octopus Package
+      env:
+        ADDITIONAL_METADATA_PATHS: ${{ inputs.additional-metadata-paths }}
       run: |
         # Check for required environment variables
         Write-Output "Looking in env vars for version info, found Version ${{env.MinVerVersion}}, Major ${{env.MinVerMajor}}, Minor ${{env.MinVerMinor}}"
@@ -29,7 +35,7 @@ runs:
 
         # Creating the expected file layout for the Octopus package, including intermediate directories
         mkdir -p packaging/content
-        
+
         # Include NuGet packages in the `nugets` folder
         # Octopus expects NuGet packages to have an extra .nzip extension for NuGet, .czip for Chocolatey
         if (Test-Path -Path nugets) {
@@ -49,7 +55,7 @@ runs:
         if ($assetCount -eq 0) {
           throw "No assets were found for the deployment package"
         }
-        
+
         # Octopus Deploy scripts need an executable file to recreate this metadata
         # $Branch is not really the branch name, when built from a tag it will be the tagged version string
         @"
@@ -60,7 +66,14 @@ runs:
         `$Minor = "${{env.MinVerMinor}}"
         `$Commit = "${{github.sha}}"
         "@ > packaging/Metadata.ps1
-        
+
+        if ($env:ADDITIONAL_METADATA_PATHS) {
+          $patterns = ($env:ADDITIONAL_METADATA_PATHS -split '[\r\n]') -ne ''
+          $patterns | ForEach-Object {
+            cp $_ packaging
+          }
+        }
+
         # Create the Octopus package
         octo pack --id="$($RepoName).Deploy" --version="${{env.MinVerVersion}}" --format="nupkg" --basePath="packaging" --outFolder="octopus-package"
       shell: pwsh
