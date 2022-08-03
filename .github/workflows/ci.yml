@@ -49,4 +49,57 @@ jobs:
           echo "Outputting contents of Metadata.ps1:"
           cat packaging/Metadata.ps1
 
+          echo ""
+          echo "Outputting all files in the packaging directory:"
+          $contents = Get-ChildItem -Recurse -Path packaging | Select-Object -Property FullName
+          echo $contents | Out-String -Width 1000
+          if (($contents | Measure-Object).Count -ne 6) {
+            throw "Unexpected number of files in packaging directory"
+          }
+
+          echo ""
+          echo "Validation of constructed Octopus Deploy package must be done by manually inspecting the asset in GitHub Actions."
+
+      - name: Prepare for second test with metadata
+        shell: pwsh
+        run: |
+          # Remove packaging directory from first Run
+          rm -R packaging
+
+          # Create extra metadata files for use in 2nd Run
+          mkdir metadata
+          echo "This is metadata" > metadata/CustomMetadata1.json
+          echo "This is metadata" > metadata/CustomMetadata2.json
+          echo "This is metadata" > CustomProperties.txt
+
+          # New fake MinVer environment variables
+          $major = Get-Date -Format "yyyy"
+          $minor = Get-Date -Format "Mdd"
+          $patch = Get-Random
+          echo "MinVerVersion=$major.$minor.$patch" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "MinVerMajor=$major" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "MinVerMinor=$minor" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Run with extra metadata files
+        uses: ./
+        with:
+          octopus-deploy-api-key: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
+          additional-metadata-paths: |
+            CustomProperties.txt
+            metadata/*.json
+      - name: Validate second test
+        shell: pwsh
+        run: |
+          echo "Outputting contents of Metadata.ps1:"
+          cat packaging/Metadata.ps1
+
+          echo ""
+          echo "Outputting all files in the packaging directory:"
+          $contents = Get-ChildItem -Recurse -Path packaging | Select-Object -Property FullName
+          echo $contents | Out-String -Width 1000
+          if (($contents | Measure-Object).Count -ne 9) {
+            throw "Unexpected number of files in packaging directory"
+          }
+
+          echo ""
           echo "Validation of constructed Octopus Deploy package must be done by manually inspecting the asset in GitHub Actions."
