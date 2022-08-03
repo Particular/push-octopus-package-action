@@ -50,9 +50,9 @@ jobs:
           cat packaging/Metadata.ps1
 
           echo "Outputting all files in the packaging directory"
-          Get-ChildItem -Recurse -Path packaging
-          $itemCount = (Get-ChildItem -Recurse | Measure-Object).Count
-          if ($itemCount -ne 6) {
+          $contents = Get-ChildItem -Recurse -Path packaging
+          echo $contents
+          if (($contents | Measure-Object).Count -ne 6) {
             throw "Unexpected number of files in packaging directory"
           }
 
@@ -92,9 +92,9 @@ jobs:
           cat packaging/Metadata.ps1
 
           echo "Outputting all files in the packaging directory"
-          Get-ChildItem -Recurse
-          $itemCount = (Get-ChildItem -Recurse -Path packaging | Measure-Object).Count
-          if ($itemCount -ne 9) {
+          $contents = Get-ChildItem -Recurse -Path packaging
+          echo $contents
+          if (($contents | Measure-Object).Count -ne 9) {
             throw "Unexpected number of files in packaging directory"
           }
 
