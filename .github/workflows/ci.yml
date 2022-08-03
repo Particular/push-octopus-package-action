@@ -49,9 +49,10 @@ jobs:
           echo "Outputting contents of Metadata.ps1:"
           cat packaging/Metadata.ps1
 
+          echo ""
           echo "Outputting all files in the packaging directory"
           $contents = Get-ChildItem -Recurse -Path packaging | Select-Object -Property FullName
-          echo $contents
+          echo $contents | Out-String -Width 1000
           if (($contents | Measure-Object).Count -ne 6) {
             throw "Unexpected number of files in packaging directory"
           }
@@ -92,9 +93,10 @@ jobs:
           echo "Outputting contents of Metadata.ps1:"
           cat packaging/Metadata.ps1
 
+          echo ""
           echo "Outputting all files in the packaging directory"
           $contents = Get-ChildItem -Recurse -Path packaging | Select-Object -Property FullName
-          echo $contents
+          echo $contents | Out-String -Width 1000
           if (($contents | Measure-Object).Count -ne 9) {
             throw "Unexpected number of files in packaging directory"
           }
