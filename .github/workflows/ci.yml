@@ -62,8 +62,14 @@ jobs:
           echo "This is metadata" > metadata/CustomMetadata1.json
           echo "This is metadata" > metadata/CustomMetadata2.json
           echo "This is metadata" > CustomProperties.txt
+
+          # New fake MinVer environment variables
+          $major = Get-Date -Format "yyyy"
+          $minor = Get-Date -Format "Mdd"
           $patch = Get-Random
           echo "MinVerVersion=$major.$minor.$patch" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "MinVerMajor=$major" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "MinVerMinor=$minor" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Run with extra metadata files
         uses: ./
