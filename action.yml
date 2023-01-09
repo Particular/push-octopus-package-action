@@ -78,7 +78,7 @@ runs:
         octo pack --id="$($RepoName).Deploy" --version="${{env.MinVerVersion}}" --format="nupkg" --basePath="packaging" --outFolder="octopus-package"
       shell: pwsh
     - name: Publish Octopus Package Artifacts
-      uses: actions/upload-artifact@v3.1.1
+      uses: actions/upload-artifact@v3.1.2
       with:
         name: octopus-package
         path: octopus-package/*
