@@ -47,7 +47,7 @@ runs:
 
         # Include executables in the `assets` folder - used for ServiceControl, ServicePulse, ServiceInsight, etc.
         if (Test-Path -Path assets) {
-          cp assets/* ./packaging/content
+          cp -Recurse assets/* ./packaging/content
         }
 
         # Make sure we aren't creating a package with zero contents
