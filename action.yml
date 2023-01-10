@@ -41,13 +41,13 @@ runs:
         if (Test-Path -Path nugets) {
           $nugets = Get-ChildItem -Path "./nugets/*.nupkg"
           foreach ($file in $nugets) {
-            cp $file "./packaging/content/$($file.Name).nzip"
+            Copy-Item $file "./packaging/content/$($file.Name).nzip"
           }
         }
 
         # Include executables in the `assets` folder - used for ServiceControl, ServicePulse, ServiceInsight, etc.
         if (Test-Path -Path assets) {
-          cp assets/* ./packaging/content
+          Copy-Item -Recurse assets/* ./packaging/content
         }
 
         # Make sure we aren't creating a package with zero contents
@@ -70,7 +70,7 @@ runs:
         if ($env:ADDITIONAL_METADATA_PATHS) {
           $patterns = ($env:ADDITIONAL_METADATA_PATHS -split '[\r\n]') -ne ''
           $patterns | ForEach-Object {
-            cp $_ packaging
+            Copy-Item $_ packaging
           }
         }
 
