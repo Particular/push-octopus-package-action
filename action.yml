@@ -8,93 +8,17 @@ inputs:
     description: 'Additional metadata files that should be copied to the root of the deployment package. File patterns are supported, one pattern per line.'
     required: false
     default: ''
+  perform-nuget-verify:
+   description: 'A flag to indicate that the nuget signature verification step should be skipped.'
+   type: boolean
+   default: 'true'
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Install Octopus CLI
       uses: OctopusDeploy/install-octopus-cli-action@v1.2.1
       with:
         version: latest
-    - name: Create Octopus Package
-      env:
-        ADDITIONAL_METADATA_PATHS: ${{ inputs.additional-metadata-paths }}
-      run: |
-        # Check for required environment variables
-        Write-Output "Looking in env vars for version info, found Version ${{env.MinVerVersion}}, Major ${{env.MinVerMajor}}, Minor ${{env.MinVerMinor}}"
-        if ($env.MinVerVersion && $env.MinVerMajor && $env.MinVerMinor) {
-          Write-Output "Version info OK"
-        } else {
-          throw "Version information from build not found in environment variables."
-        }
-
-        # Parse repo name
-        $RepoFullName = "$env:GITHUB_REPOSITORY"
-        $Org,$RepoName = $RepoFullName.Split('/')
-        # Octopus actions will need the value in an environment variable
-        echo "PARTICULAR_REPO_NAME=$RepoName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
-        # Creating the expected file layout for the Octopus package, including intermediate directories
-        mkdir -p packaging/content
-
-        # Include NuGet packages in the `nugets` folder
-        # Octopus expects NuGet packages to have an extra .nzip extension for NuGet, .czip for Chocolatey
-        if (Test-Path -Path nugets) {
-          $nugets = Get-ChildItem -Path "./nugets/*.nupkg"
-          foreach ($file in $nugets) {
-            Copy-Item $file "./packaging/content/$($file.Name).nzip"
-          }
-        }
-
-        # Include executables in the `assets` folder - used for ServiceControl, ServicePulse, ServiceInsight, etc.
-        if (Test-Path -Path assets) {
-          Copy-Item -Recurse assets/* ./packaging/content
-        }
-
-        # Make sure we aren't creating a package with zero contents
-        $assetCount = (Get-ChildItem -Path ./packaging/content | Measure-Object).Count
-        if ($assetCount -eq 0) {
-          throw "No assets were found for the deployment package"
-        }
-
-        # Octopus Deploy scripts need an executable file to recreate this metadata
-        # $Branch is not really the branch name, when built from a tag it will be the tagged version string
-        @"
-        `$Branch = "${{github.ref_name}}"
-        `$Version = "${{env.MinVerVersion}}"
-        `$Product = "$RepoName"
-        `$Major = "${{env.MinVerMajor}}"
-        `$Minor = "${{env.MinVerMinor}}"
-        `$Commit = "${{github.sha}}"
-        "@ > packaging/Metadata.ps1
-
-        if ($env:ADDITIONAL_METADATA_PATHS) {
-          $patterns = ($env:ADDITIONAL_METADATA_PATHS -split '[\r\n]') -ne ''
-          $patterns | ForEach-Object {
-            Copy-Item $_ packaging
-          }
-        }
-
-        # Create the Octopus package
-        octo pack --id="$($RepoName).Deploy" --version="${{env.MinVerVersion}}" --format="nupkg" --basePath="packaging" --outFolder="octopus-package"
-      shell: pwsh
-    - name: Publish Octopus Package Artifacts
-      uses: actions/upload-artifact@v3.1.3
-      with:
-        name: octopus-package
-        path: octopus-package/*
-        retention-days: 1
-    - name: Push package to Octopus Deploy
-      uses: OctopusDeploy/push-package-action@v2.2.0
-      with:
-        server: https://deploy.particular.net
-        api_key: ${{ inputs.octopus-deploy-api-key }}
-        packages: octopus-package/${{env.PARTICULAR_REPO_NAME}}.Deploy.${{env.MinVerVersion}}.nupkg
-    - name: Create Octopus Deploy release
-      uses: OctopusDeploy/create-release-action@v2.1.0
-      with:
-        server: https://deploy.particular.net
-        api_key: ${{ inputs.octopus-deploy-api-key }}
-        project: ${{env.PARTICULAR_REPO_NAME}}
-        release_number: ${{env.MinVerVersion}}
-        package_version: ${{env.MinVerVersion}}
-        packages: "GitReleaseManager:0.11.0"
+    - name: Verify nuget package signatures
+      if: ${{ inputs.perform-nuget-verify }}
+      run: dotnet nuget verify nugets/
