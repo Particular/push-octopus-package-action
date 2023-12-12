@@ -8,6 +8,9 @@ inputs:
     description: 'Additional metadata files that should be copied to the root of the deployment package. File patterns are supported, one pattern per line.'
     required: false
     default: ''
+  perform-nuget-verify:
+    description: 'A flag to indicate that the nuget signature verification step should be ran.'
+    default: 'true'
 runs:
   using: "composite"
   steps:
