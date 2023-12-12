@@ -11,8 +11,22 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Validate proper runner OS
+      if: runner.os != 'Windows' && (inputs.perform-assets-verify == 'true' || inputs.perform-deploy-verify == 'true')
+      run: |
+        echo "Asset and deploy signature verifications require Windows."
+        exit 1
+      shell: pwsh
     - name: Verify NuGet package signatures
       run: Get-ChildItem -Recurse -File nugets -Filter *.nupkg -ErrorAction:Ignore | foreach {dotnet nuget verify $_.FullName}
+      shell: pwsh
+    - name: Verify assets signatures
+      if: runner.os == 'Windows' && inputs.perform-assets-verify == 'true'
+      run: Get-ChildItem -Recurse -File assets -Filter *.exe | foreach {&"C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe" verify /pa $_.FullName}
+      shell: pwsh
+    - name: Verify deploy signatures
+      if: runner.os == 'Windows' && inputs.perform-deploy-verify == 'true'
+      run: Get-ChildItem -Recurse -File deploy -Filter *.cat | foreach {&"C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe" verify /pa $_.FullName}
       shell: pwsh
     - name: Install Octopus CLI
       uses: OctopusDeploy/install-octopus-cli-action@v1.2.1
