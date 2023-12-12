@@ -9,9 +9,14 @@ inputs:
     required: false
     default: ''
   perform-nuget-verify:
-   description: 'A flag to indicate that the nuget signature verification step should be skipped.'
-   type: boolean
-   default: 'true'
+    description: 'A flag to indicate that the nuget signature verification step should be ran.'
+    default: 'true'
+  perform-assets-verify:
+    description: 'A flag to indicate that the executable signature verification step should be ran.'
+    default: 'false'
+  perform-deploy-verify:
+    description: 'A flag to indicate that the cat file signature verification step should be ran.'
+    default: 'false'
 runs:
   using: 'composite'
   steps:
