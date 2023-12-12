@@ -24,6 +24,12 @@ runs:
       uses: OctopusDeploy/install-octopus-cli-action@v1.2.1
       with:
         version: latest
+    - name: Validate proper runner OS
+      if: runner.os == 'Linux' && (inputs.perform-assets-verify == 'true' || inputs.perform-deploy-verify == 'true')
+      run: |
+        echo Asset and deploy verifications require Windows.
+        exit 1
+      shell: pwsh
     - name: Verify nuget package signatures
       if: ${{ inputs.perform-nuget-verify == 'true' }}
       run: dotnet nuget verify nugets/
