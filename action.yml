@@ -28,3 +28,11 @@ runs:
       if: ${{ inputs.perform-nuget-verify == 'true' }}
       run: dotnet nuget verify nugets/
       shell: pwsh
+    - name: Verify assets signatures
+      if: runner.os == 'Windows' && inputs.perform-assets-verify == 'true'
+      run: Get-ChildItem -Recurse -File assets -Filter *.exe | foreach {&"C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe" verify /pa $_.FullName}
+      shell: pwsh
+    - name: Verify deploy signatures
+      if: runner.os == 'Windows' && inputs.perform-deploy-verify == 'true'
+      run: Get-ChildItem -Recurse -File deploy -Filter *.cat | foreach {&"C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe" verify /pa $_.FullName}
+      shell: pwsh
