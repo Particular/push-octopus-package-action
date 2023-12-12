@@ -21,7 +21,7 @@ runs:
   using: 'composite'
   steps:
    - name: Validate proper runner OS
-     if: runner.os == 'Linux' && (inputs.perform-assets-verify == 'true' || inputs.perform-deploy-verify == 'true')
+     if: runner.os != 'Windows' && (inputs.perform-assets-verify == 'true' || inputs.perform-deploy-verify == 'true')
      run: |
         echo "Asset and deploy verifications require Windows."
         exit 1
