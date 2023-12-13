@@ -8,15 +8,11 @@ inputs:
     description: 'Additional metadata files that should be copied to the root of the deployment package. File patterns are supported, one pattern per line.'
     required: false
     default: ''
-  perform-nuget-verify:
-    description: 'A flag to indicate that the nuget signature verification step should be ran.'
-    default: 'true'
 runs:
   using: "composite"
   steps:
     - name: Verify NuGet package signatures
-      if: ${{ inputs.perform-nuget-verify == 'true' }}
-      run: dotnet nuget verify nugets/
+      run: Get-ChildItem -Recurse -File nugets -Filter *.nupkg -ErrorAction:Ignore | foreach {dotnet nuget verify $_.FullName}
       shell: pwsh
     - name: Install Octopus CLI
       uses: OctopusDeploy/install-octopus-cli-action@v1.2.1
