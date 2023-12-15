@@ -11,12 +11,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Validate proper runner OS
-      if: runner.os != 'Windows' && (inputs.perform-assets-verify == 'true' || inputs.perform-deploy-verify == 'true')
-      run: |
-        echo "Asset and deploy signature verifications require Windows."
-        exit 1
-      shell: pwsh
     - name: Verify NuGet package signatures
       run: Get-ChildItem -Recurse -File nugets -Filter *.nupkg -ErrorAction:Ignore | foreach {dotnet nuget verify $_.FullName}
       shell: pwsh
