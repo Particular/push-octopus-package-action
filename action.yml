@@ -19,7 +19,7 @@ runs:
       run: |
         $sdkMajor = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\[0-9]*' | Select-Object -Property Name, @{Name = 'SortIndex'; Expression = {[int]$_.Name} } | Sort-Object -Descending -Property SortIndex | Select-Object -ExpandProperty Name -First 1
         $sdkVersion = Get-ChildItem "C:\Program Files (x86)\Windows Kits\$sdkMajor\bin\[0-9]*" | Sort-Object -Descending $_.FullName | Select-Object -ExpandProperty Name -First 1
-        $signTool = "C:\Program Files (x86)\Windows Kits\{0}\bin\{1}\x86\signtool.exe" -f $sdkMajor,$sdkVersion
+        $signTool = "C:\Program Files (x86)\Windows Kits\{0}\bin\{1}\x64\signtool.exe" -f $sdkMajor,$sdkVersion
 
         if (Test-Path -Path $signTool) {
           echo "SIGNTOOL=$signTool" >> $Env:GITHUB_ENV
