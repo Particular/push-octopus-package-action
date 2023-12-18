@@ -17,7 +17,7 @@ runs:
     - name: Setup signtool environment variable
       if: runner.os == 'Windows'
       run: |
-       $signTools =  (Get-ChildItem -Recurse 'C:\Program Files (x86)\Windows Kits\' -Filter signtool.exe  | Where-Object FullName -like "*\x86\*" | Sort-Object -Descending)
+       $signTools =  (Get-ChildItem -Recurse 'C:\Program Files (x86)\Windows Kits\10\bin' -Filter signtool.exe  | Where-Object FullName -like "*\x86\*" | Sort-Object -Descending)
        echo "SIGNTOOL=$($signTools[0].FullName)" >> $Env:GITHUB_ENV
       shell: pwsh
     - name: Verify assets signatures
