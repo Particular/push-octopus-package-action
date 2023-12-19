@@ -14,13 +14,28 @@ runs:
     - name: Verify NuGet package signatures
       run: Get-ChildItem -Recurse -File nugets -Filter *.nupkg -ErrorAction:Ignore | foreach {dotnet nuget verify $_.FullName}
       shell: pwsh
-    - name: Verify assets signatures
+    - name: Setup signtool environment variable
       if: runner.os == 'Windows'
-      run:  Get-ChildItem -Recurse -File assets -Filter *.exe -ErrorAction:Ignore | foreach {&"C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe" verify /pa $_.FullName}
+      run: |
+        $sdkMajor = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\[0-9]*' | Select-Object -Property Name, @{Name = 'SortIndex'; Expression = {[int]$_.Name} } | Sort-Object -Descending -Property SortIndex | Select-Object -ExpandProperty Name -First 1
+        $sdkVersion = Get-ChildItem "C:\Program Files (x86)\Windows Kits\$sdkMajor\bin\[0-9]*" | Sort-Object -Descending $_.FullName | Select-Object -ExpandProperty Name -First 1
+        $signTool = "C:\Program Files (x86)\Windows Kits\{0}\bin\{1}\x64\signtool.exe" -f $sdkMajor,$sdkVersion
+
+        if (Test-Path -Path $signTool) {
+          echo "SIGNTOOL=$signTool" >> $Env:GITHUB_ENV
+        }
+        else {
+          echo "Sign tool not found"
+          exit 1
+        }
       shell: pwsh
-    - name: Verify deploy signatures
+    - name: Verify executable signatures
       if: runner.os == 'Windows'
-      run:  Get-ChildItem -Recurse -File assets -Filter *.cat -ErrorAction:Ignore  | foreach {&"C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe" verify /pa $_.FullName}
+      run:  Get-ChildItem -Recurse -File assets -Filter *.exe -ErrorAction:Ignore | foreach {& "$($Env:SIGNTOOL)" verify /pa $_.FullName}
+      shell: pwsh
+    - name: Verify catalog file signatures
+      if: runner.os == 'Windows'
+      run:  Get-ChildItem -Recurse -File deploy -Filter *.cat -ErrorAction:Ignore  | foreach {& "$($Env:SIGNTOOL)" verify /pa $_.FullName}
       shell: pwsh
     - name: Install Octopus CLI
       uses: OctopusDeploy/install-octopus-cli-action@v1.2.1
