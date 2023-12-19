@@ -6,8 +6,8 @@ Pushes a release package to Octopus Deploy.
 
 Before this action runs:
 
-* NuGet packages must have been created in the root-level `nugets` directory.
-* Any additional assets to be included in the GitHub release (like app executables) must be created in the root-level `assets` directory.
+* NuGet packages must have been created in the root-level `nugets` directory and digitally signed.
+* Any additional assets to be included in the GitHub release (like app executables) must be created in the root-level `assets` directory and digitally signed.
 * The following environment variables must have been set during the build by [Particular.Packaging](https://github.com/Particular/Particular.Packaging):
     * `MinVerVersion`
     * `MinVerMajor`
@@ -54,6 +54,7 @@ This is used primarily for [ServiceControl](https://github.com/Particular/Servic
 
 This action abstracts the following steps:
 
+1. Verifying digital signatures
 1. Installing the Octopus CLI
 1. Arranging NuGet packages and other assets on disk for packaging
 1. Creating a metadata file to pass version information to Octopus Deploy
