@@ -38,7 +38,7 @@ runs:
       run:  Get-ChildItem -Recurse -File deploy -Filter *.cat -ErrorAction:Ignore  | foreach {& "$($Env:SIGNTOOL)" verify /pa $_.FullName}
       shell: pwsh
     - name: Install Octopus CLI
-      uses: OctopusDeploy/install-octopus-cli-action@v1.2.1
+      uses: OctopusDeploy/install-octopus-cli-action@v3.1.1
       with:
         version: latest
     - name: Create Octopus Package
