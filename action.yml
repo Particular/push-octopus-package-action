@@ -38,7 +38,7 @@ runs:
       run:  Get-ChildItem -Recurse -File deploy -Filter *.cat -ErrorAction:Ignore  | foreach {& "$($Env:SIGNTOOL)" verify /pa $_.FullName}
       shell: pwsh
     - name: Install Octopus CLI
-      uses: OctopusDeploy/install-octopus-cli-action@v1.2.1
+      uses: OctopusDeploy/install-octopus-cli-action@v3.1.1
       with:
         version: latest
     - name: Create Octopus Package
@@ -101,7 +101,7 @@ runs:
         }
 
         # Create the Octopus package
-        octo pack --id="$($RepoName).Deploy" --version="${{env.MinVerVersion}}" --format="nupkg" --basePath="packaging" --outFolder="octopus-package"
+        octopus pack --id="$($RepoName).Deploy" --version="${{env.MinVerVersion}}" --format="nupkg" --basePath="packaging" --outFolder="octopus-package"
       shell: pwsh
     - name: Publish Octopus Package Artifacts
       uses: actions/upload-artifact@v3.1.3
