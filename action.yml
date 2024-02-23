@@ -99,7 +99,8 @@ runs:
             Copy-Item $_ packaging
           }
         }
-
+        # Login into our server
+         octopus login --server {https://deploy.particular.net} --api-key {inputs.octopus-deploy-api-key}
         # Create the Octopus package
         octopus pack --id="$($RepoName).Deploy" --version="${{env.MinVerVersion}}" --format="nupkg" --basePath="packaging" --outFolder="octopus-package"
       shell: pwsh
