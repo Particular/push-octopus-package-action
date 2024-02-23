@@ -102,7 +102,7 @@ runs:
         # Login into our server
         octopus login --server="https://deploy.particular.net" --api-key="${{inputs.octopus-deploy-api-key}}"
         # Create the Octopus package
-        octopus package nuget create --id="$($RepoName).Deploy" --version="${{env.MinVerVersion}}" --base-path="packaging" --out-folder="octopus-package"
+        octopus package nuget create --id="$($RepoName).Deploy" --version="${{env.MinVerVersion}}" --base-path="packaging" --out-folder="octopus-package" --verbose
       shell: pwsh
     - name: Publish Octopus Package Artifacts
       uses: actions/upload-artifact@v3.1.3
