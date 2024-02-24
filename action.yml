@@ -122,13 +122,13 @@ runs:
         path: octopus-package/*
         retention-days: 1
     - name: Push package to Octopus Deploy
-      uses: OctopusDeploy/push-package-action@v2.2.0
+      uses: OctopusDeploy/push-package-action@v3.2.1
       with:
         server: https://deploy.particular.net
         api_key: ${{ inputs.octopus-deploy-api-key }}
         packages: octopus-package/${{env.PARTICULAR_REPO_NAME}}.Deploy.${{env.MinVerVersion}}.nupkg
     - name: Create Octopus Deploy release
-      uses: OctopusDeploy/create-release-action@v2.1.0
+      uses: OctopusDeploy/create-release-action@v3.2.1
       with:
         server: https://deploy.particular.net
         api_key: ${{ inputs.octopus-deploy-api-key }}
