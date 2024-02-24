@@ -127,6 +127,7 @@ runs:
         server: https://deploy.particular.net
         api_key: ${{ inputs.octopus-deploy-api-key }}
         packages: octopus-package/${{env.PARTICULAR_REPO_NAME}}.Deploy.${{env.MinVerVersion}}.nupkg
+        space: particular
     - name: Create Octopus Deploy release
       uses: OctopusDeploy/create-release-action@v3.2.1
       with:
@@ -136,3 +137,4 @@ runs:
         release_number: ${{env.MinVerVersion}}
         package_version: ${{env.MinVerVersion}}
         packages: "GitReleaseManager:0.11.0"
+        space: particular
