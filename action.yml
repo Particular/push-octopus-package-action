@@ -37,11 +37,11 @@ runs:
       if: runner.os == 'Windows'
       run:  Get-ChildItem -Recurse -File deploy -Filter *.cat -ErrorAction:Ignore  | foreach {& "$($Env:SIGNTOOL)" verify /pa $_.FullName}
       shell: pwsh
-    - name: Install Octopus CLI
-      uses: OctopusDeploy/install-octopus-cli-action@v3.1.1
-      with:
-        version: latest
-    - name: Create Octopus Package
+  #  - name: Install Octopus CLI
+   #   uses: OctopusDeploy/install-octopus-cli-action@v3.1.1
+    #  with:
+     #   version: latest
+    - name: Create the files
       env:
         ADDITIONAL_METADATA_PATHS: ${{ inputs.additional-metadata-paths }}
       run: |
@@ -100,10 +100,19 @@ runs:
           }
         }
         # Login into our server
-        octopus login --server="https://deploy.particular.net" --api-key="${{inputs.octopus-deploy-api-key}}"
+        #octopus login --server="https://deploy.particular.net" --api-key="${{inputs.octopus-deploy-api-key}}"
         # Create the Octopus package
-        octopus package nuget create --id="$($RepoName).Deploy" --version="${{env.MinVerVersion}}" --base-path="packaging" --out-folder="octopus-package" --verbose
+        #octopus package nuget create --id="$($RepoName).Deploy" --version="${{env.MinVerVersion}}" --base-path="packaging" --out-folder="octopus-package" --verbose
       shell: pwsh
+    - name: Create a NuGet package
+      uses: OctopusDeploy/create-nuget-package-action@v3.1.1
+      with:
+        package_id: '${{env.PARTICULAR_REPO_NAME}}'
+        version: '${{env.MinVerVersion}}'
+        output_folder: 'octopus-package'
+        base_path: packaging
+        files: |
+        **/*.*
     - name: Publish Octopus Package Artifacts
       uses: actions/upload-artifact@v3.1.3
       with:
