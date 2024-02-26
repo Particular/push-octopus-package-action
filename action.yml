@@ -37,10 +37,6 @@ runs:
       if: runner.os == 'Windows'
       run:  Get-ChildItem -Recurse -File deploy -Filter *.cat -ErrorAction:Ignore  | foreach {& "$($Env:SIGNTOOL)" verify /pa $_.FullName}
       shell: pwsh
-  #  - name: Install Octopus CLI
-   #   uses: OctopusDeploy/install-octopus-cli-action@v3.1.1
-    #  with:
-     #   version: latest
     - name: Create the files
       env:
         ADDITIONAL_METADATA_PATHS: ${{ inputs.additional-metadata-paths }}
@@ -99,10 +95,6 @@ runs:
             Copy-Item $_ packaging
           }
         }
-        # Login into our server
-        #octopus login --server="https://deploy.particular.net" --api-key="${{inputs.octopus-deploy-api-key}}"
-        # Create the Octopus package
-        #octopus package nuget create --id="$($RepoName).Deploy" --version="${{env.MinVerVersion}}" --base-path="packaging" --out-folder="octopus-package" --verbose
       shell: pwsh
     - name: Create a NuGet package
       id: package
