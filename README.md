@@ -20,7 +20,7 @@ Before this action runs:
 ```yaml
     steps:
       - name: Deploy
-        uses: Particular/push-octopus-package-action@v1.0.0
+        uses: Particular/push-octopus-package-action@v2.0.0
         with:
           octopus-deploy-api-key: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
 ```
@@ -32,7 +32,7 @@ This is used primarily for [ServiceControl](https://github.com/Particular/Servic
 ```yaml
     steps:
       - name: Deploy
-        uses: Particular/push-octopus-package-action@v1.0.0
+        uses: Particular/push-octopus-package-action@v2.0.0
         with:
           octopus-deploy-api-key: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
           additional-metadata-paths: metadata/*.json
@@ -42,7 +42,7 @@ This is used primarily for [ServiceControl](https://github.com/Particular/Servic
 ```yaml
     steps:
       - name: Deploy
-        uses: Particular/push-octopus-package-action@v1.0.0
+        uses: Particular/push-octopus-package-action@v2.0.0
         with:
           octopus-deploy-api-key: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
           additional-metadata-paths: |
@@ -54,7 +54,6 @@ This is used primarily for [ServiceControl](https://github.com/Particular/Servic
 
 This action abstracts the following steps:
 
-1. Installing the Octopus CLI
 1. Arranging NuGet packages and other assets on disk for packaging
 1. Creating a metadata file to pass version information to Octopus Deploy
 1. Packaging the content into a RepoName.Deploy package
