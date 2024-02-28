@@ -53,6 +53,7 @@ jobs:
           echo "Outputting all files in the packaging directory:"
           $contents = Get-ChildItem -Recurse -Path packaging | Select-Object -Property FullName
           echo $contents | Out-String -Width 1000
+          # Directory entry, Metadata.ps1, Octopus-generated nuspec, + 2 assets & 2 nupkg
           if (($contents | Measure-Object).Count -ne 7) {
             throw "Unexpected number of files in packaging directory"
           }
@@ -97,6 +98,7 @@ jobs:
           echo "Outputting all files in the packaging directory:"
           $contents = Get-ChildItem -Recurse -Path packaging | Select-Object -Property FullName
           echo $contents | Out-String -Width 1000
+          # Same 7 previous entries + 3 new custom metadata files
           if (($contents | Measure-Object).Count -ne 10) {
             throw "Unexpected number of files in packaging directory"
           }

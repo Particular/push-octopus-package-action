@@ -96,7 +96,7 @@ runs:
           }
         }
       shell: pwsh
-    - name: Create a NuGet package
+    - name: Create an Octopus NuGet deployment package
       id: package
       uses: OctopusDeploy/create-nuget-package-action@v3.1.1
       with:
@@ -106,8 +106,8 @@ runs:
         base_path: packaging
         files: |
           **/*.*
-        nuspec_description: This is a real description
-        nuspec_authors: Particular software
+        nuspec_description: Deployment package for ${{env.PARTICULAR_REPO_NAME}} - not for nuget.org
+        nuspec_authors: Particular Software
     - name: Publish Octopus Package Artifacts
       uses: actions/upload-artifact@v3.1.3
       with:
