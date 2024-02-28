@@ -100,7 +100,7 @@ runs:
       id: package
       uses: OctopusDeploy/create-nuget-package-action@v3.1.1
       with:
-        package_id: ${{env.PARTICULAR_REPO_NAME}}
+        package_id: ${{env.PARTICULAR_REPO_NAME}}.Deploy
         version: ${{env.MinVerVersion}}
         output_folder: octopus-package
         base_path: packaging
