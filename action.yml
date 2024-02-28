@@ -37,11 +37,7 @@ runs:
       if: runner.os == 'Windows'
       run:  Get-ChildItem -Recurse -File deploy -Filter *.cat -ErrorAction:Ignore  | foreach {& "$($Env:SIGNTOOL)" verify /pa $_.FullName}
       shell: pwsh
-    - name: Install Octopus CLI
-      uses: OctopusDeploy/install-octopus-cli-action@v1.2.1
-      with:
-        version: latest
-    - name: Create Octopus Package
+    - name: Create the files
       env:
         ADDITIONAL_METADATA_PATHS: ${{ inputs.additional-metadata-paths }}
       run: |
@@ -99,24 +95,34 @@ runs:
             Copy-Item $_ packaging
           }
         }
-
-        # Create the Octopus package
-        octo pack --id="$($RepoName).Deploy" --version="${{env.MinVerVersion}}" --format="nupkg" --basePath="packaging" --outFolder="octopus-package"
       shell: pwsh
-    - name: Publish Octopus Package Artifacts
-      uses: actions/upload-artifact@v3.1.3
+    - name: Create an Octopus NuGet deployment package
+      id: package
+      uses: OctopusDeploy/create-nuget-package-action@v3.1.1
       with:
-        name: octopus-package
-        path: octopus-package/*
+        package_id: ${{env.PARTICULAR_REPO_NAME}}.Deploy
+        version: ${{env.MinVerVersion}}
+        output_folder: octopus-package
+        base_path: packaging
+        files: |
+          **/*.*
+        nuspec_description: Deployment package for ${{env.PARTICULAR_REPO_NAME}} - not for nuget.org
+        nuspec_authors: Particular Software
+    - name: Publish Octopus Package Artifacts
+      uses: actions/upload-artifact@v4.3.1
+      with:
+        name: ${{steps.package.outputs.package_filename}}
+        path: ${{steps.package.outputs.package_file_path}}
         retention-days: 1
     - name: Push package to Octopus Deploy
-      uses: OctopusDeploy/push-package-action@v2.2.0
+      uses: OctopusDeploy/push-package-action@v3.2.1
       with:
         server: https://deploy.particular.net
         api_key: ${{ inputs.octopus-deploy-api-key }}
-        packages: octopus-package/${{env.PARTICULAR_REPO_NAME}}.Deploy.${{env.MinVerVersion}}.nupkg
+        packages: ${{steps.package.outputs.package_file_path}}
+        space: "Default"
     - name: Create Octopus Deploy release
-      uses: OctopusDeploy/create-release-action@v2.1.0
+      uses: OctopusDeploy/create-release-action@v3.2.1
       with:
         server: https://deploy.particular.net
         api_key: ${{ inputs.octopus-deploy-api-key }}
@@ -124,3 +130,4 @@ runs:
         release_number: ${{env.MinVerVersion}}
         package_version: ${{env.MinVerVersion}}
         packages: "GitReleaseManager:0.11.0"
+        space: "Default"
