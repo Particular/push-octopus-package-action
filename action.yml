@@ -115,7 +115,7 @@ runs:
         path: ${{steps.package.outputs.package_file_path}}
         retention-days: 1
     - name: Push package to Octopus Deploy
-      uses: OctopusDeploy/push-package-action@v3.2.1
+      uses: OctopusDeploy/push-package-action@v3.2.2
       with:
         server: https://deploy.particular.net
         api_key: ${{ inputs.octopus-deploy-api-key }}
