@@ -8,6 +8,10 @@ inputs:
     description: 'Additional metadata files that should be copied to the root of the deployment package. File patterns are supported, one pattern per line.'
     required: false
     default: ''
+  meta:
+    description: Set to true if deploy package is only a meta package and no assets are generated
+    required: false
+    default: false
 runs:
   using: "composite"
   steps:
@@ -40,6 +44,7 @@ runs:
     - name: Create the files
       env:
         ADDITIONAL_METADATA_PATHS: ${{ inputs.additional-metadata-paths }}
+        META: ${{ inputs.meta }}
       run: |
         # Check for required environment variables
         Write-Output "Looking in env vars for version info, found Version ${{env.MinVerVersion}}, Major ${{env.MinVerMajor}}, Minor ${{env.MinVerMinor}}"
@@ -74,8 +79,11 @@ runs:
 
         # Make sure we aren't creating a package with zero contents
         $assetCount = (Get-ChildItem -Path ./packaging/content | Measure-Object).Count
-        if ($assetCount -eq 0) {
+        if ( ($assetCount -eq 0) -and (!$env.META)) {
           throw "No assets were found for the deployment package"
+        }
+        if ( ($assetCount -gt 0) -and ($env.META)) {
+          throw "Assets were found on meta only package"
         }
 
         # Octopus Deploy scripts need an executable file to recreate this metadata
