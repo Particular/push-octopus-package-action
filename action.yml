@@ -79,7 +79,7 @@ runs:
 
         # Make sure we aren't creating a package with zero contents
         $assetCount = (Get-ChildItem -Path ./packaging/content | Measure-Object).Count
-        if ( ($assetCount -eq 0) -and ($env.THROW_IF_NO_ASSETS_FOUND)) {
+        if ( ($assetCount -eq 0) -and ($env.THROW_IF_NO_ASSETS_FOUND) ) {
           throw "No assets were found for the deployment package"
         }
 
