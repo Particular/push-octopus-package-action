@@ -82,9 +82,6 @@ runs:
         if ( ($assetCount -eq 0) -and ($env.THROW_IF_NO_ASSETS_FOUND)) {
           throw "No assets were found for the deployment package"
         }
-        if ( ($assetCount -gt 0) -and ($env.META)) {
-          throw "Assets were found on meta only package"
-        }
 
         # Octopus Deploy scripts need an executable file to recreate this metadata
         # $Branch is not really the branch name, when built from a tag it will be the tagged version string
