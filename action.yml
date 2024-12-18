@@ -114,7 +114,7 @@ runs:
         nuspec_description: Deployment package for ${{env.PARTICULAR_REPO_NAME}} - not for nuget.org
         nuspec_authors: Particular Software
     - name: Publish Octopus Package Artifacts
-      uses: actions/upload-artifact@v4.4.3
+      uses: actions/upload-artifact@v4.5.0
       with:
         name: ${{steps.package.outputs.package_filename}}
         path: ${{steps.package.outputs.package_file_path}}
