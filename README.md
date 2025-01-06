@@ -20,7 +20,7 @@ Before this action runs:
 ```yaml
     steps:
       - name: Deploy
-        uses: Particular/push-octopus-package-action@v1.0.0
+        uses: Particular/push-octopus-package-action@v2.0.0
         with:
           octopus-deploy-api-key: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
 ```
@@ -32,7 +32,7 @@ This is used primarily for [ServiceControl](https://github.com/Particular/Servic
 ```yaml
     steps:
       - name: Deploy
-        uses: Particular/push-octopus-package-action@v1.0.0
+        uses: Particular/push-octopus-package-action@v2.0.0
         with:
           octopus-deploy-api-key: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
           additional-metadata-paths: metadata/*.json
@@ -42,7 +42,7 @@ This is used primarily for [ServiceControl](https://github.com/Particular/Servic
 ```yaml
     steps:
       - name: Deploy
-        uses: Particular/push-octopus-package-action@v1.0.0
+        uses: Particular/push-octopus-package-action@v2.0.0
         with:
           octopus-deploy-api-key: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}
           additional-metadata-paths: |

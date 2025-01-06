@@ -8,6 +8,10 @@ inputs:
     description: 'Additional metadata files that should be copied to the root of the deployment package. File patterns are supported, one pattern per line.'
     required: false
     default: ''
+  throw-if-no-assets-found:
+    description: Set to false if deploy package is only a meta package and no assets are generated
+    required: false
+    default: true
 runs:
   using: "composite"
   steps:
@@ -37,13 +41,10 @@ runs:
       if: runner.os == 'Windows'
       run:  Get-ChildItem -Recurse -File deploy -Filter *.cat -ErrorAction:Ignore  | foreach {& "$($Env:SIGNTOOL)" verify /pa $_.FullName}
       shell: pwsh
-    - name: Install Octopus CLI
-      uses: OctopusDeploy/install-octopus-cli-action@v1.2.1
-      with:
-        version: latest
-    - name: Create Octopus Package
+    - name: Create the files
       env:
         ADDITIONAL_METADATA_PATHS: ${{ inputs.additional-metadata-paths }}
+        THROW_IF_NO_ASSETS_FOUND: ${{ inputs.throw-if-no-assets-found }}
       run: |
         # Check for required environment variables
         Write-Output "Looking in env vars for version info, found Version ${{env.MinVerVersion}}, Major ${{env.MinVerMajor}}, Minor ${{env.MinVerMinor}}"
@@ -78,7 +79,7 @@ runs:
 
         # Make sure we aren't creating a package with zero contents
         $assetCount = (Get-ChildItem -Path ./packaging/content | Measure-Object).Count
-        if ($assetCount -eq 0) {
+        if ( ($assetCount -eq 0) -and ($env.THROW_IF_NO_ASSETS_FOUND) ) {
           throw "No assets were found for the deployment package"
         }
 
@@ -99,28 +100,39 @@ runs:
             Copy-Item $_ packaging
           }
         }
-
-        # Create the Octopus package
-        octo pack --id="$($RepoName).Deploy" --version="${{env.MinVerVersion}}" --format="nupkg" --basePath="packaging" --outFolder="octopus-package"
       shell: pwsh
-    - name: Publish Octopus Package Artifacts
-      uses: actions/upload-artifact@v3.1.3
+    - name: Create an Octopus NuGet deployment package
+      id: package
+      uses: OctopusDeploy/create-nuget-package-action@v3.1.1
       with:
-        name: octopus-package
-        path: octopus-package/*
+        package_id: ${{env.PARTICULAR_REPO_NAME}}.Deploy
+        version: ${{env.MinVerVersion}}
+        output_folder: octopus-package
+        base_path: packaging
+        files: |
+          **/*.*
+        nuspec_description: Deployment package for ${{env.PARTICULAR_REPO_NAME}} - not for nuget.org
+        nuspec_authors: Particular Software
+    - name: Publish Octopus Package Artifacts
+      uses: actions/upload-artifact@v4.5.0
+      with:
+        name: ${{steps.package.outputs.package_filename}}
+        path: ${{steps.package.outputs.package_file_path}}
         retention-days: 1
     - name: Push package to Octopus Deploy
-      uses: OctopusDeploy/push-package-action@v2.2.0
+      uses: OctopusDeploy/push-package-action@v3.2.2
       with:
         server: https://deploy.particular.net
         api_key: ${{ inputs.octopus-deploy-api-key }}
-        packages: octopus-package/${{env.PARTICULAR_REPO_NAME}}.Deploy.${{env.MinVerVersion}}.nupkg
+        packages: ${{steps.package.outputs.package_file_path}}
+        space: "Default"
     - name: Create Octopus Deploy release
-      uses: OctopusDeploy/create-release-action@v2.1.0
+      uses: OctopusDeploy/create-release-action@v3.2.2
       with:
         server: https://deploy.particular.net
         api_key: ${{ inputs.octopus-deploy-api-key }}
         project: ${{env.PARTICULAR_REPO_NAME}}
         release_number: ${{env.MinVerVersion}}
         package_version: ${{env.MinVerVersion}}
-        packages: "GitReleaseManager:0.11.0"
+        packages: "GitReleaseManager:0.17.0"
+        space: "Default"
