@@ -127,7 +127,7 @@ runs:
         packages: ${{steps.package.outputs.package_file_path}}
         space: "Default"
     - name: Create Octopus Deploy release
-      uses: OctopusDeploy/create-release-action@v3.2.2
+      uses: OctopusDeploy/create-release-action@v3.2.3
       with:
         server: https://deploy.particular.net
         api_key: ${{ inputs.octopus-deploy-api-key }}
