@@ -103,7 +103,7 @@ runs:
       shell: pwsh
     - name: Create an Octopus NuGet deployment package
       id: package
-      uses: OctopusDeploy/create-nuget-package-action@v3.1.1
+      uses: OctopusDeploy/create-nuget-package-action@v3.1.2
       with:
         package_id: ${{env.PARTICULAR_REPO_NAME}}.Deploy
         version: ${{env.MinVerVersion}}
