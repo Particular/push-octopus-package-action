@@ -72,7 +72,7 @@ runs:
           }
         }
 
-        # Include executables in the `assets` folder - used for ServiceControl, ServicePulse, ServiceInsight, etc.
+        # Include executables in the `assets` folder - used for ServiceControl, ServicePulse, etc.
         if (Test-Path -Path assets) {
           Copy-Item -Recurse assets/* ./packaging/content
         }
